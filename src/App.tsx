@@ -5,7 +5,7 @@ import Profile from "./routes/profile";
 import Login from "./routes/login";
 import CreateAccount from "./routes/create-account";
 import LoadingScreen from "./components/loading-screen";
-import { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
 import { useEffect, useState } from "react";
 import { auth } from "./firebase";
@@ -48,6 +48,12 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+`;
+
 const App = () => {
   const [isLoading, setLoading] = useState(true);
   const init = async () => {
@@ -61,8 +67,10 @@ const App = () => {
 
   return (
     <>
-      <GlobalStyles />
-      {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
+      <Wrapper>
+        <GlobalStyles />
+        {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
+      </Wrapper>
     </>
   );
 };
