@@ -73,7 +73,6 @@ const CreateAccount = () => {
       setLoading(true);
       //자격증명
       const credentials = await createUserWithEmailAndPassword(auth, email, password);
-      console.log(credentials.user);
       //사용자 이름 업데이트
       await updateProfile(credentials.user, {
         displayName: name,
