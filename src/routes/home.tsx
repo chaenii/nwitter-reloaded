@@ -1,5 +1,14 @@
+import styled from "styled-components";
+import PostTweetForm from "../components/post-tweet-form";
+
+const Wrapper = styled.div``;
+
 const Home = () => {
-  return <h1></h1>;
+  return (
+    <Wrapper>
+      <PostTweetForm />
+    </Wrapper>
+  );
 };
 
 export default Home;
