@@ -1,7 +1,8 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, updateDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const Form = styled.form`
   display: flex;
@@ -65,8 +66,14 @@ const PostTweetForm = () => {
   };
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
+    const mb = 1024 * 1024;
+
     if (files && files.length === 1) {
-      setFile(files[0]);
+      if (files[0].size > mb) {
+        alert("1mb 미만만 \n 업로드가 가능합니당~");
+      } else {
+        setFile(files[0]);
+      }
     }
   };
 
@@ -78,12 +85,22 @@ const PostTweetForm = () => {
 
     try {
       setIsLoading(true);
-      await addDoc(collection(db, "tweets"), {
+      const doc = await addDoc(collection(db, "tweets"), {
         tweet,
         createdAt: Date.now(),
         username: user.displayName || "Anonymous",
         userId: user.uid,
       });
+      if (file) {
+        const locationRef = ref(storage, `tweets/${user.uid}-${user.displayName}/${doc.id}`);
+        const result = await uploadBytes(locationRef, file);
+        const url = await getDownloadURL(result.ref);
+        await updateDoc(doc, {
+          photo: url,
+        });
+      }
+      setTweet("");
+      setFile(null);
     } catch (error) {
       console.log(error);
     } finally {
@@ -93,7 +110,7 @@ const PostTweetForm = () => {
 
   return (
     <Form onSubmit={onSubmit}>
-      <TextArea rows={5} maxLength={180} onChange={onChange} value={tweet} placeholder="What is happening?!" />
+      <TextArea required rows={5} maxLength={180} onChange={onChange} value={tweet} placeholder="What is happening?!" />
       <AttachFileButton htmlFor="file">{file ? "Photo Added📌" : "Add photo"}</AttachFileButton>
       <AttachFileInput onChange={onFileChange} type="file" id="file" accept="image/*" />
       <SubmitButton type="submit" value={isLoading ? "Posting..." : "Post Tweet"} />
