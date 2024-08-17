@@ -3,7 +3,7 @@ import { ITweet } from "./timeline";
 import { auth, storage } from "../firebase";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
-import { deleteObject } from "firebase/storage";
+import { deleteObject, ref } from "firebase/storage";
 
 const Wrapper = styled.div`
   display: grid;
@@ -46,7 +46,7 @@ const Tweet = ({ username, photo, tweet, userId, id }: ITweet) => {
     try {
       await deleteDoc(doc(db, "tweets", id));
       if (photo) {
-        const photoRef = ret(storage, `tweets/${user.uid}/${id}`);
+        const photoRef = ref(storage, `tweets/${user.uid}/${id}`);
         await deleteObject(photoRef);
       }
     } catch (e) {
